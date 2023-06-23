@@ -140,17 +140,6 @@ const PasswordGenerator = ({ onSavePassword }) => {
 
 
 
-// # ------------------------------------------- # \\
-// # ------------------------------------------- # \\
-// # ------------------------------------------- # \\
-// # ------------------------------------------- # \\
-
-
-
-
-
-
-
 const PasswordContainer = () => {
 
     const MAX_PASSWORDS = 10;
@@ -177,7 +166,7 @@ const PasswordContainer = () => {
                 showConfirmButton: true,
                 confirmButtonColor: '#41644A',
                 confirmButtonText: 'I understand',
-                footer: '<div style="text-align: center">There is a limit of 10 passwords to be saved on your browser storage</div>',
+                footer: '<div style="text-align: center">There is a limit of 10 passwords to be saved on your browser storage.</div>',
                 allowEscapeKey: false,
                 allowEnterKey: false,
                 allowOutsideClick: false,
