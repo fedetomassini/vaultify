@@ -1,0 +1,28 @@
+// Font \\
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+// Variables \\
+$backgroundColor: #1c1c1c;
+
+$passwordsContainer: rgb(18, 18, 18);
+
+$textColor: #bbbbbb;
+
+
+
+
+body{
+    margin: 0;
+    cursor: default;
+    font-family: 'Quicksand', sans-serif;
+    background-color: $backgroundColor;
+}
+
+::-webkit-scrollbar{
+    width: 2px;
+    height: 2px;
+    background-color: #1a2027;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #8B97A2;
+}
