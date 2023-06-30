@@ -1,5 +1,5 @@
 <h3 align="center">
-	<img src="https://raw.githubusercontent.com/fedetomassini/safepass/public/website.ico" width="100" alt="SafePass"/><br/>
+	<img src="https://raw.githubusercontent.com/fedetomassini/safepass/main/public/website.ico" width="100" alt="SafePass"/><br/>
 	<a href="https://github.com/fedetomassini/safepass">SafePass</a><br/>
   <span>A safety password generator</span>
 </h3>
