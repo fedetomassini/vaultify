@@ -1,5 +1,39 @@
 // Font \\
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@font-face {
+    font-family: 'Quicksand';
+    src: url('../Fonts/Quicksand/static/Quicksand-VariableFont_wght.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('../Fonts/Quicksand/static/Quicksand-Light.woff2') format('woff2');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('../Fonts/Quicksand/static/Quicksand-Regular.woff2') format('woff2');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('../Fonts/Quicksand/static/Quicksand-Medium.woff2') format('woff2');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('../Fonts/Quicksand/static/Quicksand-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('../Fonts/Quicksand/static/Quicksand-Bold.woff2') format('woff2');
+    font-weight: 700;
+}
+
 
 // Variables \\
 $textColor: #bbbbbb;
