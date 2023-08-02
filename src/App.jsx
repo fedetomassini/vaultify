@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMessage, faFingerprint } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faFingerprint } from '@fortawesome/free-solid-svg-icons';
 
 import ModuleStyles from '../src/Assets/Styles/App.module.scss';
 import website_logo  from '../src/Assets/Images/website.png';
@@ -12,7 +12,7 @@ const App = () => {
 		<header>
 			<h1 id={ModuleStyles.title}>SafePass <FontAwesomeIcon icon={faFingerprint}/></h1>
 			<img id={ModuleStyles.website_logo} src={website_logo} heigth={32} width={32} title={'SafePass by Federico Tomassini'}/>
-			<a id={ModuleStyles.feedback} href='https://github.com/fedetomassini/safepass/issues' target='_blank'><FontAwesomeIcon icon={faMessage} size='xl' title={'Send Feedback!'}/></a>
+			<a id={ModuleStyles.feedback} href='https://github.com/fedetomassini/safepass/issues' target='_blank'><FontAwesomeIcon icon={faCommentDots} size='xl' title={'Send Feedback!'}/></a>
 		</header>
 
 		<PasswordContainer/>

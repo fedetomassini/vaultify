@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faKey, faTrashCan, faLock, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
+import { faKey, faTrashCan, faLock } from '@fortawesome/free-solid-svg-icons';
 import { ClipboardCopyIcon } from '@radix-ui/react-icons';
 
 
@@ -29,10 +29,13 @@ const PasswordGenerator = ({ onSavePassword }) => {
     const copyToClipboard = () => {
         if(password === ''){
             Swal.fire({
-                title: 'SafePass',
-                text: `You need to generate a password first :)`,
+                title: '<span style="color: #FFABAB; font-weight: bold;">SafePass</span>',
+                timer: 3750,
+                timerProgressBar: true,
+                html: `<span style="font-weight: bold;">You need to generate a password first :)</span>`,
                 icon: 'error',
                 showConfirmButton: true,
+                confirmButtonText: 'Oops, ok!',
                 allowEscapeKey: false,
                 allowEnterKey: false,
                 allowOutsideClick: false,
@@ -44,10 +47,13 @@ const PasswordGenerator = ({ onSavePassword }) => {
         }else{
             navigator.clipboard.writeText(password);
             Swal.fire({
-                title: 'SafePass',
-                text: `${password} \ has been copied to clipboard successfully!`,
+                title: '<span style="color: #FFABAB; font-weight: bold;">SafePass</span>',
+                timer: 3750,
+                timerProgressBar: true,
+                html: `<span style="color: #3fcf8e; font-weight: bold;">${password}</span> has been copied to clipboard successfully!`,
                 icon: 'success',
                 showConfirmButton: true,
+                confirmButtonText: 'Alr, thank you!',
                 allowEscapeKey: false,
                 allowEnterKey: false,
                 allowOutsideClick: false,
@@ -60,15 +66,17 @@ const PasswordGenerator = ({ onSavePassword }) => {
         }         
     };
 
-    const clearStorage = (savedPasswords) => {
-        const STORAGE_CONTAINER = localStorage.getItem('LatestPasswords', savedPasswords);
-        if(localStorage.length === 0){
+    const clearStorage = () => {
+        const STORAGE_CONTAINER = JSON.parse(localStorage.getItem('LatestPasswords'));
+        if(!STORAGE_CONTAINER || STORAGE_CONTAINER.length === 0){
             Swal.fire({
-                title: 'SafePass',
+                title: '<span style="color: #FFABAB; font-weight: bold;">SafePass</span>',
+                timer: 3750,
+                timerProgressBar: true,
                 icon: 'info',
-                text: 'The passwords list is empty.',
+                html: '<span style="font-weight: bold;">The passwords list is empty.</span>',
                 showConfirmButton: true,
-                confirmButtonText: 'Ok',
+                confirmButtonText: 'Oops!',
                 confirmButtonColor: '#41644A',
                 allowEscapeKey: false,
                 allowEnterKey: false,
@@ -82,10 +90,10 @@ const PasswordGenerator = ({ onSavePassword }) => {
             localStorage.clear(STORAGE_CONTAINER);
             console.clear();
             Swal.fire({
-                text: `The passwords list has been cleared successfully! \ Reloading website...`,
-                icon: 'success',
                 timer: 1750,
                 timerProgressBar: true,
+                html: `<span style="font-weight: bold;">The passwords list has been cleared successfully! \ Reloading website...</span>`,
+                icon: 'success',
                 showConfirmButton: false,
                 allowEscapeKey: false,
                 allowEnterKey: false,
@@ -107,18 +115,17 @@ const PasswordGenerator = ({ onSavePassword }) => {
         localStorage.setItem('LatestPasswords', JSON.stringify([]));
     }
 
-    const GENERATOR_BTN = useRef(null);
+    // Comportamiento del botón para generar contraseñas \\
+    const [generatorBtnDisabled, setGeneratorBtnDisabled] = useState(false);
     const STORAGE_LENGTH = localStorage['LatestPasswords'].length;
     const IS_FULL_STORAGE = localStorage.getItem('isFullStorage');
 
     useEffect(() => {
-        if (GENERATOR_BTN.current){
-            if (STORAGE_LENGTH >= 281 || IS_FULL_STORAGE === 'true'){
-                GENERATOR_BTN.current.disabled = true;
-                // Funciona correctamente, solo queda por ver que se actualice al momento sin necesidad de reiniciar el DOM.
-            }
+        if (STORAGE_LENGTH >= 309.1 || IS_FULL_STORAGE === 'true') {
+          setGeneratorBtnDisabled(true);
+          localStorage.setItem('isFullStorage', true)
         }
-    }, []);
+    }, [STORAGE_LENGTH, IS_FULL_STORAGE]);
 
 	return(
 		<>
@@ -128,7 +135,7 @@ const PasswordGenerator = ({ onSavePassword }) => {
 		</section>
 
         <section className={PasswordStyles.buttonContainer}>
-            <button id={PasswordStyles.passwordGeneratorBtn} disabled={false} ref={GENERATOR_BTN} onClick={generatePassword}><FontAwesomeIcon icon={faKey}/></button> 
+            <button id={PasswordStyles.passwordGeneratorBtn} disabled={generatorBtnDisabled} onClick={generatePassword}><FontAwesomeIcon icon={faKey}/></button> 
             <button id={PasswordStyles.clearStorageBtn} onClick={clearStorage}><FontAwesomeIcon icon={faTrashCan}/></button>  
         </section>
 		</>
@@ -158,10 +165,13 @@ const PasswordContainer = () => {
         if(prevPasswords.length <= MAX_PASSWORDS) {
             setPasswords(prevPasswords);
             localStorage.setItem('LatestPasswords', JSON.stringify(prevPasswords));
+            // console.log(prevPasswords.length) //
         }else {
             Swal.fire({
-                title: 'SafePass',
-                text: `The storage limit has been reached: [${MAX_PASSWORDS}] PASSWORDS`,
+                title: '<span style="color: #FFABAB; font-weight: bold;">SafePass</span>',
+                timer: 10750,
+                timerProgressBar: true,
+                html: `<span style="font-weight: bold;">The storage limit has been reached: [<span style="color: #D14D72">${MAX_PASSWORDS}</span>] PASSWORDS</span>`,
                 icon: 'error',
                 showConfirmButton: true,
                 confirmButtonColor: '#41644A',
@@ -175,7 +185,7 @@ const PasswordContainer = () => {
                 background: "#232924",
                 color: "#8B97A2"
             })
-            localStorage.setItem('isFullStorage', true)
+            localStorage.setItem('isFullStorage', true);
             console.info(`%cThe storage limit has been reached: [${MAX_PASSWORDS}] PASSWORDS`, 'color: #B04759');
         }
     };
@@ -183,17 +193,20 @@ const PasswordContainer = () => {
     const copyToClipboard = (password) => {
         navigator.clipboard.writeText(password);
         Swal.fire({
-          title: 'SafePass',
-          text: `${password} has been copied to clipboard successfully!`,
-          icon: 'success',
-          showConfirmButton: true,
-          allowEscapeKey: false,
-          allowEnterKey: false,
-          allowOutsideClick: false,
-          heightAuto: true,
-          width: 425,
-          background: '#232924',
-          color: '#8B97A2',
+            title: '<span style="color: #FFABAB; font-weight: bold;">SafePass</span>',
+            timer: 3750,
+            timerProgressBar: true,
+            html: `<span style="color: #3fcf8e; font-weight: bold;">${password}</span> has been copied to clipboard successfully!`,
+            icon: 'success',
+            showConfirmButton: true,
+            confirmButtonText: 'Alr, thank you!',
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            allowOutsideClick: false,
+            heightAuto: true,
+            width: 425,
+            background: '#232924',
+            color: '#8B97A2',
         });
         console.info(`%c${password} has been copied to clipboard!`, 'color: #5C8984');
     };

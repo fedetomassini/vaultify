@@ -1,14 +1,15 @@
 @import '../Styles/Index.scss';
 
-$feedbackIconColor: #A76F6F;
+$feedbackIconColor: #B9F3E4;
 $githubLinkColor: #E8D2A6;
 
 header{
     #title{
-        color: $textColor;
+        color: #FFABAB;
         font-size: 25pt;
         font-weight: 700;
-        font-style: italic;
+        font-style: normal;
+        letter-spacing: 1px;
         margin-top: 32px;
         margin-bottom: -60px;
         margin-left: 15px;
