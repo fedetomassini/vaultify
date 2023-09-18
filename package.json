@@ -12,7 +12,7 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "sass": "^1.66.1",
-    "sweetalert2": "^11.7.27"
+    "sweetalert2": "^11.7.28"
   },
   "scripts": {
     "dev": "react-scripts start",
