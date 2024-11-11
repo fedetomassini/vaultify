@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-Thin.woff2") format("woff2");
+	font-weight: 100;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-ExtraLight.woff2") format("woff2");
+	font-weight: 200;
+	font-display: swap;
+	font-style: normal;
+}
+
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-ExtraBold.woff2") format("woff2");
+	font-weight: 800;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-Black.woff2") format("woff2");
+	font-weight: 900;
+	font-display: swap;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url("../app/fonts/GeistMono-VariableFont_wght.woff2") format("woff2");
+	font-weight: 1;
+	font-display: swap;
+	font-style: normal;
+}
+
+@layer base {
+	* {
+    --toastify-color-progress-success: rgb(99, 102, 241);
+		--toastify-icon-color-success: rgb(99, 102, 241);
+		--toastify-color-progress-warning: rgb(99, 102, 241);
+		--toastify-icon-color-warning: rgb(99, 102, 241);
+		--toastify-color-progress-error: rgb(99, 102, 241);
+		--toastify-icon-color-error: rgb(99, 102, 241);
+	}
+
+	body{
+		font-family: "Geist Mono", serif !important;
+		scroll-behavior: smooth !important;
+	}
+
+	::selection,
+	::-moz-selection {
+		@apply bg-indigo-200;
+	}
+
+	::-webkit-scrollbar {
+		width: 2px;
+		height: 2px;
+		&:hover {
+			width: 4px;
+			height: 4px;
+		}
+		@apply bg-transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		@apply bg-indigo-400;
+	}
+}
