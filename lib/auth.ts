@@ -58,5 +58,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			return session;
 		},
 	},
-	secret: env.NEXTAUTH_SECRET,
+	secret: env.NEXT_AUTH_SECRET,
 });
