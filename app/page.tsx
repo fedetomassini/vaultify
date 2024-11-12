@@ -1,9 +1,13 @@
 import { auth } from "@/lib/auth";
 // Components \\
-import { AuthPanel } from "@/components/authpanel";
-import { Home } from "@/components/home";
+import { AuthPanel } from "@/components/authentication";
+import { Board } from "@/components/board";
+
+/**
+ * @readonly
+ */
 
 export default async function Root() {
 	const session = await auth();
-	return <>{session ? <Home /> : <AuthPanel />}</>;
+	return <>{session ? <Board /> : <AuthPanel />}</>;
 }
