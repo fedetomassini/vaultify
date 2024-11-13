@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, KeyRound, ChevronDown, Linkedin, Github } from "lucide-react";
 import { env } from "@/lib/env";
 import ReactCountryFlag from "react-country-flag";
+// User Features\\
+import { languages } from "@/lib/definitions";
 
 /**
  * @alias UserAuthentication
@@ -15,17 +17,54 @@ export const AuthPanel = () => {
 	const [isLogin, setIsLogin] = useState(true);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [name, setName] = useState("");
+	const [username, setUserName] = useState("");
 	const [language, setLanguage] = useState("en");
 	const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+	const [error, setError] = useState("");
 
-	const toggleForm = () => setIsLogin(!isLogin);
+	const toggleForm = () => {
+		setIsLogin(!isLogin);
+		setError("");
+	};
+
 	const toggleLanguageMenu = () => setIsLanguageMenuOpen(!isLanguageMenuOpen);
 
-	const languages = [
-		{ code: "en", name: "English", countryCode: "GB" },
-		// { code: "es", name: "Español", countryCode: "ES" },
-	];
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError("");
+
+		if (isLogin) {
+			try {
+				const response = await fetch("/api/auth/signin", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, email, password }),
+				});
+
+				if (!response.ok) {
+					const data = await response.json();
+					setError(data.message);
+				}
+			} catch (err) {
+				setError("An error occurred. Please try again.");
+			}
+		} else {
+			try {
+				const response = await fetch("/api/auth/signup", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, email, password }),
+				});
+
+				if (!response.ok) {
+					const data = await response.json();
+					setError(data.message);
+				}
+			} catch (err) {
+				setError("An error occurred. Please try again.");
+			}
+		}
+	};
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300 p-4">
@@ -101,58 +140,57 @@ export const AuthPanel = () => {
 							exit={{ opacity: 0, x: isLogin ? 100 : -100 }}
 							transition={{ duration: 0.3 }}
 							className="space-y-6"
+							onSubmit={handleSubmit}
 						>
+							<div>
+								<label htmlFor="username" className="block text-sm font-medium mb-2 text-emerald-200/80">
+									{isLogin ? "Username" : "Choose a username"}
+								</label>
+								<motion.div whileFocus={{ scale: 1.02 }} className="relative">
+									<User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-200/70" size={18} />
+									<input
+										type="text"
+										id="username"
+										value={username}
+										onChange={(e) => setUserName(e.target.value)}
+										className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50  disabled:opacity-50 text-gray-300"
+										placeholder="Enter your username..."
+										autoComplete="off"
+										autoCorrect="off"
+										min={1}
+										minLength={1}
+										max={15}
+										maxLength={15}
+									/>
+								</motion.div>
+							</div>
 							{!isLogin && (
 								<div>
-									<label htmlFor="name" className="block text-sm font-medium mb-2 text-emerald-200/80">
-										Username
+									<label htmlFor="email" className="block text-sm font-medium mb-2 text-emerald-200/80">
+										Email
 									</label>
 									<motion.div whileFocus={{ scale: 1.02 }} className="relative">
-										<User
+										<Mail
 											className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-200/70"
 											size={18}
 										/>
 										<input
-											type="text"
-											id="name"
-											value={name}
-											onChange={(e) => setName(e.target.value)}
-											className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50  disabled:opacity-50 text-gray-300"
-											placeholder="Insert a username..."
+											type="email"
+											id="email"
+											value={email}
+											onChange={(e) => setEmail(e.target.value)}
+											className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300"
+											placeholder="Insert a valid email..."
 											autoComplete="off"
 											autoCorrect="off"
-											autoCapitalize="off"
 											min={1}
 											minLength={1}
-											max={15}
-											maxLength={15}
+											max={30}
+											maxLength={30}
 										/>
 									</motion.div>
 								</div>
 							)}
-							<div>
-								<label htmlFor="email" className="block text-sm font-medium mb-2 text-emerald-200/80">
-									Email
-								</label>
-								<motion.div whileFocus={{ scale: 1.02 }} className="relative">
-									<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-200/70" size={18} />
-									<input
-										type="email"
-										id="email"
-										value={email}
-										onChange={(e) => setEmail(e.target.value)}
-										className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300"
-										placeholder="Insert a valid email..."
-										autoComplete="off"
-										autoCorrect="off"
-										autoCapitalize="off"
-										min={1}
-										minLength={1}
-										max={30}
-										maxLength={30}
-									/>
-								</motion.div>
-							</div>
 							<div>
 								<label htmlFor="password" className="block text-sm font-medium mb-2 text-emerald-200/80">
 									Password
@@ -171,7 +209,6 @@ export const AuthPanel = () => {
 										placeholder="•••••••••••••"
 										autoComplete="off"
 										autoCorrect="off"
-										autoCapitalize="off"
 										min={1}
 										minLength={1}
 										max={50}
@@ -179,6 +216,7 @@ export const AuthPanel = () => {
 									/>
 								</motion.div>
 							</div>
+							{error && <p className="text-red-400 text-sm">{error}</p>}
 							<motion.button
 								whileHover={{ scale: 1.015 }}
 								whileTap={{ scale: 0.95 }}

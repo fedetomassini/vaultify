@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { cookies } from "next/headers";
 // Components \\
 import { AuthPanel } from "@/components/authentication";
 import { Board } from "@/components/board";
@@ -8,6 +8,7 @@ import { Board } from "@/components/board";
  */
 
 export default async function Root() {
-	const session = await auth();
-	return <>{session ? <Board /> : <AuthPanel />}</>;
+	const token = cookies().get("vault_token")?.value;
+
+	return <>{token ? <Board /> : <AuthPanel />}</>;
 }

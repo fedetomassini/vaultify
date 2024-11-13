@@ -1,33 +1,40 @@
 import mongoose, { Model } from "mongoose";
-import { hash, compare } from "bcryptjs";
+import { compareSync, hashSync } from "bcryptjs";
 
 interface IUser {
 	username: string;
+	email: string;
 	password: string;
 }
-
-const UserSchema = new mongoose.Schema<IUser, UserModelType, UserMethods>({
-	username: String,
-	password: String,
-});
-
-UserSchema.pre("save", async function (next) {
-	const hashedPassword = await hash(this.password, 10);
-	this.password = hashedPassword;
-	next();
-});
 
 interface UserMethods {
 	isValidPassword: (password: string) => Promise<boolean>;
 }
 
+const UserSchema = new mongoose.Schema<IUser, UserModelType, UserMethods>({
+	username: String,
+	email: String,
+	password: String,
+});
+
+UserSchema.pre("save", async function (next) {
+	try {
+		if (!this.isModified("password") || (this.isModified("password") && typeof this.password === "string")) {
+			const hashedPassword = await hashSync(this.password, 10);
+			this.password = hashedPassword;
+		}
+		return next();
+	} catch (error: any) {
+		return next(error);
+	}
+});
+
 type UserModelType = Model<IUser, {}, UserMethods>;
 
-// Verifica si el modelo ya existe
 const UserModel = mongoose.models.User || mongoose.model<IUser, UserModelType>("User", UserSchema);
 
 UserSchema.method("isValidPassword", async function (password: string): Promise<boolean> {
-	const isValid = await compare(password, this.password);
+	const isValid = await compareSync(password, this.password);
 	return isValid;
 });
 

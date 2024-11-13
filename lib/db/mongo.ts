@@ -8,10 +8,8 @@ const conn: boolean | any = {
 export async function connectDB() {
 	if (conn.isConnected) return;
 
-	const dbName = env.DB_NAME;
-
 	const db = await mongoose.connect(`mongodb+srv://${env.DB_USER}:${env.DB_PASSWORD}@${env.DB_NETWORK}/`, {
-		dbName: dbName,
+		dbName: env.DB_NAME,
 	} as ConnectOptions);
 
 	conn.isConnected = db.connections[0].readyState;

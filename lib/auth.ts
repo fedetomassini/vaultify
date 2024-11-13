@@ -2,10 +2,11 @@ import { connectDB } from "@/lib/db/mongo";
 import NextAuth, { CredentialsSignin } from "next-auth";
 import { env } from "@/lib/env";
 import credentials from "next-auth/providers/credentials";
+// Models \\
 import { UserModel } from "@/lib/db/models";
 
 class InvalidLoginError extends CredentialsSignin {
-	code = "El usuario o la contraseña son incorrectos.";
+	code = "Username or password is incorrect.";
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -15,6 +16,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			credentials: {
 				username: { label: "Username", type: "text" },
 				password: { label: "Password", type: "password" },
+				email: { label: "Email", type: "email" },
 			},
 			async authorize(credentials: any) {
 				await connectDB();
@@ -24,6 +26,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 					return {
 						id: user._id.toString(),
 						name: user.username,
+						email: user.email,
 					};
 				}
 
@@ -33,11 +36,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 	],
 	session: {
 		strategy: "jwt",
-		maxAge: 15 * 15,
-		updateAge: 15 * 15,
+		maxAge: 900,
+		updateAge: 900,
 	},
 	jwt: {
-		maxAge: 15 * 15,
+		maxAge: 900,
 	},
 	callbacks: {
 		async signIn({ user }) {
@@ -47,6 +50,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			if (user) {
 				token.id = user.id;
 				token.name = user.name;
+				token.email = user.email;
 			}
 			return token;
 		},
@@ -54,6 +58,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			session.user = {
 				id: token.id as string,
 				name: token.name as string,
+				email: token.email as string,
 			} as any;
 			return session;
 		},
