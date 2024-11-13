@@ -27,7 +27,6 @@ export async function POST(request: Request) {
 		const response = NextResponse.json({ message: "Signin successful" });
 		response.cookies.set("vault_token", token, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
 			maxAge: 900,
 			path: "/",
 		});
