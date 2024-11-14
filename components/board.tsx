@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Copy, Plus, Trash2, Eye, EyeOff, Mail, Linkedin, Github, ChevronDown, User, Check } from "lucide-react";
-import Image from "next/image";
-import ReactCountryFlag from "react-country-flag";
-import { env } from "@/lib/env";
+import { Copy, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 // Interfaces \\
-import { PasswordEntry, SelectProps } from "@/lib/definitions";
+import { PasswordEntry } from "@/lib/definitions";
 // User Features\\
-import { languages, categoryOptions } from "@/lib/definitions";
+import { categoryOptions } from "@/lib/definitions";
+// Components \\
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Selector } from "@/components/selector";
 
 /**
  * @alias UserPasswordManagement
@@ -28,9 +29,7 @@ export const Board = () => {
 		password: "",
 		category: "Entertainment",
 	});
-	const [language, setLanguage] = useState("en");
-	const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
-	const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
 
 	const generatePassword = useCallback(() => {
 		const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -74,85 +73,15 @@ export const Board = () => {
 		navigator.clipboard.writeText(text);
 	};
 
-	const toggleLanguageMenu = () => setIsLanguageMenuOpen(!isLanguageMenuOpen);
-	const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
-
 	return (
 		<div className="min-h-screen bg-gray-900 text-gray-300 p-4 flex flex-col items-center">
-			<header className="w-full flex justify-between items-center mb-8">
-				<div className="w-1/3"></div>
-				<Image src="/logo.webp" width={120} height={120} alt="Vaultify" className="mx-auto" />
-				<div className="w-1/3 flex flex-col items-end space-y-2">
-					<div className="relative">
-						<button
-							onClick={toggleUserMenu}
-							className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
-						>
-							<User className="w-6 h-6" />
-							<ChevronDown size={16} />
-						</button>
-						{isUserMenuOpen && (
-							<div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg z-10">
-								<button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 focus:outline-none">
-									Profile
-								</button>
-								<button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 focus:outline-none">
-									Settings
-								</button>
-								<button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 focus:outline-none">
-									Logout
-								</button>
-							</div>
-						)}
-					</div>
-					<div className="relative">
-						<button
-							onClick={toggleLanguageMenu}
-							className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
-						>
-							<ReactCountryFlag
-								countryCode={languages.find((lang) => lang.code === language)?.countryCode || "GB"}
-								svg
-								style={{
-									width: "1.5em",
-									height: "1.5em",
-								}}
-								title={language}
-								className="rounded-full"
-							/>
-							<span className="text-sm">{language.toUpperCase()}</span>
-							<ChevronDown size={16} />
-						</button>
-						{isLanguageMenuOpen && (
-							<div className="absolute right-0 mt-2 w-40 bg-gray-700 rounded-md shadow-lg z-10">
-								{languages.map((lang) => (
-									<button
-										key={lang.code}
-										onClick={() => {
-											setLanguage(lang.code);
-											setIsLanguageMenuOpen(false);
-										}}
-										className="flex items-center space-x-2 w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
-									>
-										<ReactCountryFlag
-											countryCode={lang.countryCode}
-											svg
-											style={{
-												width: "1.5em",
-												height: "1.5em",
-											}}
-											title={lang.name}
-											className="rounded-full"
-										/>
-										<span>{lang.name}</span>
-									</button>
-								))}
-							</div>
-						)}
-					</div>
-				</div>
-			</header>
+			{/*  */}
+      <Header/>
+      {/*  */}
 			<main className="w-full max-w-3xl mx-auto space-y-8">
+				{/*  */}
+				{/*  */}
+				{/*  */}
 				<section>
 					<div className="flex justify-between items-center mb-4">
 						<h2 className="text-2xl font-semibold text-emerald-200/80">Saved Passwords</h2>
@@ -206,6 +135,9 @@ export const Board = () => {
 						)}
 					</div>
 				</section>
+				{/*  */}
+				{/*  */}
+				{/*  */}
 				<section className="space-y-4">
 					<h2 className="text-2xl font-semibold text-emerald-200/80">Add New Password</h2>
 					<div className="space-y-2">
@@ -240,7 +172,7 @@ export const Board = () => {
 						</div>
 						<div className="space-y-2">
 							<label className="text-gray-300">Category</label>
-							<CustomSelect value={newPassword.category} onChange={handleCategoryChange} options={categoryOptions} />
+							<Selector value={newPassword.category} onChange={handleCategoryChange} options={categoryOptions} />
 						</div>
 						<button
 							onClick={handleAddPassword}
@@ -250,6 +182,9 @@ export const Board = () => {
 						</button>
 					</div>
 				</section>
+				{/*  */}
+				{/*  */}
+				{/*  */}
 				<section className="space-y-4">
 					<h2 className="text-2xl font-semibold text-emerald-200/80">Password Generator</h2>
 					<div className="bg-gray-800 rounded-lg p-6 space-y-4">
@@ -304,69 +239,13 @@ export const Board = () => {
 						</button>
 					</div>
 				</section>
+				{/*  */}
+				{/*  */}
+				{/*  */}
 			</main>
-			<footer className="mt-8 text-center">
-				<p className="text-sm text-emerald-200/60 mb-2">{env.NEXT_PUBLIC_APP_VERSION}</p>
-				<div className="flex justify-center space-x-4">
-					<a href="mailto:contact@vaultify.com" className="text-emerald-200/60 hover:text-emerald-200/80">
-						<Mail size={20} />
-					</a>
-					<a
-						href="https://linkedin.com/company/vaultify"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-emerald-200/60 hover:text-emerald-200/80"
-					>
-						<Linkedin size={20} />
-					</a>
-					<a
-						href="https://github.com/vaultify"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-emerald-200/60 hover:text-emerald-200/80"
-					>
-						<Github size={20} />
-					</a>
-				</div>
-			</footer>
-		</div>
-	);
-};
-
-const CustomSelect: React.FC<SelectProps> = ({ value, onChange, options }) => {
-	const [isOpen, setIsOpen] = useState(false);
-
-	return (
-		<div className="relative">
-			<button
-				type="button"
-				onClick={() => setIsOpen(!isOpen)}
-				className="w-full p-3 bg-emerald-200/10 text-emerald-200/80 rounded-md flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
-			>
-				{options.find((option) => option.value === value)?.label || "Select category"}
-				<ChevronDown
-					size={20}
-					className={`transition-transform duration-200 ${isOpen ? "transform rotate-180" : ""}`}
-				/>
-			</button>
-			{isOpen && (
-				<div className="absolute z-10 w-full mt-1 bg-gray-800 border border-emerald-200/20 rounded-md shadow-lg">
-					{options.map((option) => (
-						<button
-							key={option.value}
-							type="button"
-							onClick={() => {
-								onChange(option.value);
-								setIsOpen(false);
-							}}
-							className="w-full px-4 py-2 text-left text-emerald-200/80 hover:bg-emerald-200/10 focus:outline-none focus:bg-emerald-200/20 flex items-center justify-between"
-						>
-							{option.label}
-							{value === option.value && <Check size={16} className="text-emerald-400" />}
-						</button>
-					))}
-				</div>
-			)}
+      {/*  */}
+      <Footer/>
+      {/*  */}
 		</div>
 	);
 };

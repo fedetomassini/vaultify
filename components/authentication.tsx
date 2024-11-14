@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, KeyRound, ChevronDown, Linkedin, Github } from "lucide-react";
 import { env } from "@/lib/env";
 import ReactCountryFlag from "react-country-flag";
+import { useRouter } from "next/navigation";
 // User Features\\
 import { languages } from "@/lib/definitions";
 
@@ -21,6 +22,8 @@ export const AuthPanel = () => {
 	const [language, setLanguage] = useState("en");
 	const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 	const [error, setError] = useState("");
+
+	const navigate = useRouter();
 
 	const toggleForm = () => {
 		setIsLogin(!isLogin);
@@ -45,6 +48,7 @@ export const AuthPanel = () => {
 					const data = await response.json();
 					setError(data.message);
 				}
+				navigate.refresh();
 			} catch (err) {
 				setError("An error occurred. Please try again.");
 			}

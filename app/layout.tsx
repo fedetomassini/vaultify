@@ -53,7 +53,7 @@ export default function RootLayout(
 	session: Session,
 ) {
 	return (
-		<html lang="es" suppressHydrationWarning>
+		<html lang="en" suppressHydrationWarning>
 			<body>
 				<SessionProvider session={session}>
 					<main>
