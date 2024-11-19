@@ -7,12 +7,10 @@ export async function POST(request: Request) {
 		await connectDB();
 		const { email, password, username } = await request.json();
 
-		const existingUser = await UserModel.findOne({
+		const user = await UserModel.findOne({
 			$or: [{ email }, { username }],
 		});
-		if (existingUser) {
-			return NextResponse.json({ message: "Email or username already exists" }, { status: 409 });
-		}
+		if (user) return NextResponse.json({ message: "Email or username already exists." }, { status: 409 });
 
 		const newUser = new UserModel({
 			email,
@@ -22,8 +20,8 @@ export async function POST(request: Request) {
 
 		await newUser.save();
 
-		return NextResponse.json({ message: "User created successfully" }, { status: 201 });
+		return NextResponse.json({ message: "User created successfully." }, { status: 201 });
 	} catch (error: any) {
-		return NextResponse.json({ message: "Internal server error", error: error.message }, { status: 500 });
+		return NextResponse.json({ message: "Internal server error.", error: error.message }, { status: 500 });
 	}
 }

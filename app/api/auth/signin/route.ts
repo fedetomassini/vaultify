@@ -13,19 +13,19 @@ export async function POST(request: Request) {
 		const user = await UserModel.findOne({ username });
 
 		if (!user) {
-			return NextResponse.json({ message: "User not found" }, { status: 404 });
+			return NextResponse.json({ message: "User not found. :(" }, { status: 404 });
 		}
 
 		const isPasswordValid = await bcrypt.compareSync(password, user.password);
 
 		if (!isPasswordValid) {
-			return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+			return NextResponse.json({ message: "Invalid credentials. :(" }, { status: 401 });
 		}
 
 		const token = jwt.sign({ userId: user._id }, env.JWT_SECRET!, { expiresIn: "15m" });
 
 		const response = NextResponse.json({ message: "Signin successful" });
-		response.cookies.set("vault_token", token, {
+		response.cookies.set("v_token", token, {
 			httpOnly: true,
 			maxAge: 900,
 			path: "/",

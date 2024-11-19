@@ -1,14 +1,16 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 // Components \\
 import { AuthPanel } from "@/components/authentication";
-import { Board } from "@/components/board";
 
 /**
  * @readonly
  */
 
 export default async function Root() {
-	const token = cookies().get("vault_token")?.value;
+	const token = cookies().get("v_token")?.value;
 
-	return <>{token ? <Board /> : <AuthPanel />}</>;
+	token ? redirect("/vault") : null;
+
+	return <AuthPanel />;
 }

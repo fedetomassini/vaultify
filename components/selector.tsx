@@ -11,7 +11,7 @@ export const Selector: React.FC<SelectProps> = ({ value, onChange, options }) =>
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className="w-full p-3 bg-emerald-200/10 text-emerald-200/80 rounded-md flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
+				className="w-full p-3 bg-emerald-200/10 text-emerald-200/80 rounded-md flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-200/50 transition-colors"
 			>
 				{options.find((option) => option.value === value)?.label || "Select category"}
 				<ChevronDown
@@ -29,7 +29,7 @@ export const Selector: React.FC<SelectProps> = ({ value, onChange, options }) =>
 								onChange(option.value);
 								setIsOpen(false);
 							}}
-							className="w-full px-4 py-2 text-left text-emerald-200/80 hover:bg-emerald-200/10 focus:outline-none focus:bg-emerald-200/20 flex items-center justify-between"
+							className="w-full px-4 py-2 text-left text-emerald-200/80 hover:bg-emerald-200/10 focus:outline-none focus:bg-emerald-200/20 flex items-center justify-between transition-colors"
 						>
 							{option.label}
 							{value === option.value && <Check size={16} className="text-emerald-400" />}

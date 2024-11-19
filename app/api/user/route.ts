@@ -19,9 +19,7 @@ export async function GET() {
 		}
 
 		const user = await UserModel.findOne({ username });
-		if (!user) {
-			return NextResponse.json({ error: "User not found." }, { status: 404 });
-		}
+		if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 });
 
 		const userData = await UserModel.findById(user._id);
 
@@ -46,9 +44,7 @@ export async function DELETE(_request: Request) {
 		}
 
 		const user = await UserModel.findOne({ username });
-		if (!user) {
-			return NextResponse.json({ error: "User not found." }, { status: 404 });
-		}
+		if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 });
 
 		await UserModel.deleteOne({ username });
 

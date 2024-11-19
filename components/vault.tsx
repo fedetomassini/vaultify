@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Copy, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 // Interfaces \\
 import { PasswordEntry } from "@/lib/definitions";
 // User Features\\
@@ -15,7 +16,7 @@ import { Selector } from "@/components/selector";
  * @alias UserPasswordManagement
  */
 
-export const Board = () => {
+export const UserVault = () => {
 	const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
 	const [showPasswords, setShowPasswords] = useState<Record<number, boolean>>({});
 	const [generatedPassword, setGeneratedPassword] = useState("");
@@ -25,11 +26,9 @@ export const Board = () => {
 	const [useSymbols, setUseSymbols] = useState(true);
 	const [newPassword, setNewPassword] = useState({
 		site: "",
-		username: "",
 		password: "",
 		category: "Entertainment",
 	});
-
 
 	const generatePassword = useCallback(() => {
 		const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -58,11 +57,34 @@ export const Board = () => {
 		setNewPassword((prev) => ({ ...prev, category: value }));
 	};
 
-	const handleAddPassword = () => {
-		const newPasswordEntry = { ...newPassword, password: generatedPassword || newPassword.password, id: Date.now() };
-		setPasswords((prev) => [...prev, newPasswordEntry]);
-		setNewPassword({ site: "", username: "", password: "", category: "Entertainment" });
-		setGeneratedPassword("");
+	const handleAddPassword = async () => {
+		const newPasswordEntry = {
+			site: newPassword.site,
+			password: generatedPassword || newPassword.password,
+			category: newPassword.category,
+		};
+
+		try {
+			const response = await fetch("/api/user/passwords", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify(newPasswordEntry),
+			});
+
+			if (response.ok) {
+				const savedPassword = await response.json();
+				setPasswords((prev) => [...prev, savedPassword]);
+				setNewPassword({ site: "", password: "", category: "Entertainment" });
+				setGeneratedPassword("");
+			} else {
+				console.error("Failed to save password.");
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		}
 	};
 
 	const togglePasswordVisibility = (id: number) => {
@@ -74,132 +96,166 @@ export const Board = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-900 text-gray-300 p-4 flex flex-col items-center">
-			{/*  */}
-      <Header/>
-      {/*  */}
-			<main className="w-full max-w-3xl mx-auto space-y-8">
-				{/*  */}
-				{/*  */}
-				{/*  */}
-				<section>
+		<motion.div
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.5 }}
+			className="min-h-screen bg-gray-900 text-gray-300 p-4 flex flex-col items-center"
+		>
+			<Header />
+			<motion.main
+				initial={{ y: 20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ delay: 0.2, duration: 0.5 }}
+				className="w-full max-w-3xl mx-auto space-y-8"
+			>
+				<motion.section
+					initial={{ scale: 0.9, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{ delay: 0.3, duration: 0.5 }}
+				>
 					<div className="flex justify-between items-center mb-4">
-						<h2 className="text-2xl font-semibold text-emerald-200/80">Saved Passwords</h2>
-						<button
-							className="p-2 text-gray-900 rounded-full bg-emerald-200/60 hover:bg-emerald-200/70 focus:outline-none"
-							aria-label="Add new password"
-							onClick={() => {}}
-						>
-							<Plus className="w-5 h-5" />
-						</button>
+						<h2 className="text-2xl font-semibold text-emerald-200/80">~ Saved Passwords ~</h2>
 					</div>
-					<div className="space-y-4">
+					<AnimatePresence>
 						{passwords.length === 0 ? (
-							<div className="text-gray-400">No saved passwords yet.</div>
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="text-gray-400"
+							>
+								No saved passwords yet.
+							</motion.div>
 						) : (
 							passwords.map((item) => (
-								<div key={item.id} className="bg-gray-800 rounded-md p-4">
+								<motion.div
+									key={item.id}
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -20 }}
+									transition={{ duration: 0.3 }}
+									className="bg-gray-800 rounded-md p-4 mb-4"
+								>
 									<div className="flex justify-between items-center">
 										<span className="text-emerald-200/80 font-bold mb-3">{item.site}</span>
-										<button
+										<motion.button
+											whileHover={{ scale: 1.1 }}
+											whileTap={{ scale: 0.9 }}
 											className="text-red-400/40 hover:text-red-400/70 focus:outline-none"
 											aria-label="Delete password"
 										>
 											<Trash2 className="w-5 h-5" />
-										</button>
+										</motion.button>
 									</div>
 									<div className="flex items-center space-x-2">
 										<input
 											type={showPasswords[item.id] ? "text" : "password"}
 											value={showPasswords[item.id] ? item.password : "**************"}
 											readOnly
-											className="bg-gray-700 text-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 w-full"
+											className="bg-gray-700 text-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 w-full transition-colors"
 										/>
-										<button
+										<motion.button
+											whileHover={{ scale: 1.1 }}
+											whileTap={{ scale: 0.9 }}
 											onClick={() => togglePasswordVisibility(item.id)}
 											className="text-emerald-200/60 hover:text-emerald-200/70 focus:outline-none"
 											aria-label={showPasswords[item.id] ? "Hide password" : "Show password"}
 										>
 											{showPasswords[item.id] ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-										</button>
-										<button
+										</motion.button>
+										<motion.button
+											whileHover={{ scale: 1.1 }}
+											whileTap={{ scale: 0.9 }}
 											onClick={() => copyToClipboard(item.password)}
-											className="text-emerald-200/60 hover:text-emerald-200/70 focus:outline-none"
+											className="text-emerald-200/60 hover:text-emerald-200/70 focus:outline-none transition-colors"
 											aria-label="Copy password"
 										>
 											<Copy className="w-5 h-5" />
-										</button>
+										</motion.button>
 									</div>
-								</div>
+								</motion.div>
 							))
 						)}
-					</div>
-				</section>
-				{/*  */}
-				{/*  */}
-				{/*  */}
-				<section className="space-y-4">
-					<h2 className="text-2xl font-semibold text-emerald-200/80">Add New Password</h2>
+					</AnimatePresence>
+				</motion.section>
+				<motion.section
+					initial={{ scale: 0.9, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{ delay: 0.4, duration: 0.5 }}
+					className="space-y-4"
+				>
+					<h2 className="text-2xl font-semibold text-emerald-200/80">~ Add New Password ~</h2>
 					<div className="space-y-2">
-						<input
+						<label className="text-gray-300">Website</label>
+						<motion.input
+							whileFocus={{ scale: 1.02 }}
 							type="text"
 							name="site"
 							value={newPassword.site}
 							onChange={handleNewPasswordChange}
-							placeholder="Site"
-							className="w-full p-3 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
+							placeholder="example - www.facebook.com"
+							className="w-full p-3 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 transition-colors"
 						/>
 						<div className="space-y-2">
 							<label className="text-gray-300">Generated Password</label>
 							<div className="relative">
-								<input
+								<motion.input
+									whileFocus={{ scale: 1.02 }}
 									type="text"
 									name="password"
 									value={generatedPassword || newPassword.password}
 									onChange={handleNewPasswordChange}
-									placeholder="Password"
+									placeholder="Your password will be here..."
 									readOnly={!generatedPassword}
-									className="w-full p-3 pr-10 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
+									className="w-full p-3 pr-10 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 transition-colors"
 								/>
-								<button
+								<motion.button
+									whileHover={{ scale: 1.1 }}
+									whileTap={{ scale: 0.9 }}
 									onClick={() => copyToClipboard(generatedPassword || newPassword.password)}
-									className="absolute right-2 top-1/2 transform -translate-y-1/2 text-emerald-200/60 hover:text-emerald-200/70 focus:outline-none"
+									className="absolute right-2 top-1/2 transform -translate-y-1/2 text-emerald-200/60 hover:text-emerald-200/70 focus:outline-none transition-colors"
 									aria-label="Copy password"
 								>
 									<Copy className="w-5 h-5" />
-								</button>
+								</motion.button>
 							</div>
 						</div>
 						<div className="space-y-2">
 							<label className="text-gray-300">Category</label>
 							<Selector value={newPassword.category} onChange={handleCategoryChange} options={categoryOptions} />
 						</div>
-						<button
+						<motion.button
+							whileHover={{ scale: 1.02 }}
+							whileTap={{ scale: 0.98 }}
 							onClick={handleAddPassword}
-							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md"
+							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md transition-colors"
 						>
 							Add Password
-						</button>
+						</motion.button>
 					</div>
-				</section>
-				{/*  */}
-				{/*  */}
-				{/*  */}
-				<section className="space-y-4">
-					<h2 className="text-2xl font-semibold text-emerald-200/80">Password Generator</h2>
+				</motion.section>
+				<motion.section
+					initial={{ scale: 0.9, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{ delay: 0.5, duration: 0.5 }}
+					className="space-y-4"
+				>
+					<h2 className="text-2xl font-semibold text-emerald-200/80">~ Password Generator ~</h2>
 					<div className="bg-gray-800 rounded-lg p-6 space-y-4">
 						<div>
 							<label htmlFor="passwordLength" className="block text-gray-300 mb-1">
 								Password Length
 							</label>
-							<input
+							<motion.input
+								whileFocus={{ scale: 1.02 }}
 								type="number"
 								id="passwordLength"
 								value={passwordLength}
 								min={8}
 								max={32}
 								onChange={(e) => setPasswordLength(Number(e.target.value))}
-								className="w-full p-3 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
+								className="w-full p-3 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 transition-colors"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -226,26 +282,23 @@ export const Board = () => {
 									type="checkbox"
 									checked={useSymbols}
 									onChange={() => setUseSymbols(!useSymbols)}
-									className="mr-2 checked:bg-emerald-200/60 checked:border-emerald-200"
+									className="mr-2 checked:bg-emerald-200/60 checked:border-emerald-200 transition-colors"
 								/>
 								Include Symbols
 							</label>
 						</div>
-						<button
+						<motion.button
+							whileHover={{ scale: 1.02 }}
+							whileTap={{ scale: 0.98 }}
 							onClick={generatePassword}
-							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md"
+							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md transition-colors"
 						>
 							Generate Password
-						</button>
+						</motion.button>
 					</div>
-				</section>
-				{/*  */}
-				{/*  */}
-				{/*  */}
-			</main>
-      {/*  */}
-      <Footer/>
-      {/*  */}
-		</div>
+				</motion.section>
+			</motion.main>
+			<Footer />
+		</motion.div>
 	);
 };

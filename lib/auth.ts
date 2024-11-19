@@ -6,7 +6,7 @@ import credentials from "next-auth/providers/credentials";
 import { UserModel } from "@/lib/db/models";
 
 class InvalidLoginError extends CredentialsSignin {
-	code = "Username or password is incorrect.";
+	code = "Username or password are invalid.";
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

@@ -1,41 +1,65 @@
-import mongoose, { Model } from "mongoose";
-import { compareSync, hashSync } from "bcryptjs";
+import mongoose, { Schema, Model } from "mongoose";
+import { hashSync, compareSync } from "bcryptjs";
+
+/**
+ * @alias Interfaces
+ */
+interface IPassword {
+	site: string;
+	username: string;
+	password: string;
+	category: string;
+	createdAt: Date;
+}
 
 interface IUser {
 	username: string;
 	email: string;
 	password: string;
+	passwords: IPassword[];
 }
 
 interface UserMethods {
-	isValidPassword: (password: string) => Promise<boolean>;
+	isValidPassword: (password: string) => boolean;
 }
 
-const UserSchema = new mongoose.Schema<IUser, UserModelType, UserMethods>({
-	username: String,
-	email: String,
-	password: String,
+/**
+ * @alias Schemas
+ */
+
+const PasswordSchema = new Schema<IPassword>({
+	site: { type: String, required: true },
+	username: { type: String, required: true },
+	password: { type: String, required: true },
+	category: { type: String, default: "General" },
+	createdAt: { type: Date, default: Date.now },
 });
 
-UserSchema.pre("save", async function (next) {
+const UserSchema = new mongoose.Schema<IUser, UserModelType, UserMethods>({
+	username: { type: String, required: true, unique: true },
+	email: { type: String, required: true, unique: true },
+	password: { type: String, required: true },
+	passwords: [PasswordSchema],
+});
+
+UserSchema.pre("save", function (next) {
+	const user = this;
+
+	if (!user.isModified("password")) return next();
+
 	try {
-		if (!this.isModified("password") || (this.isModified("password") && typeof this.password === "string")) {
-			const hashedPassword = await hashSync(this.password, 10);
-			this.password = hashedPassword;
-		}
-		return next();
+		user.password = hashSync(user.password, 10);
+		next();
 	} catch (error: any) {
-		return next(error);
+		next(error);
 	}
 });
 
-type UserModelType = Model<IUser, {}, UserMethods>;
-
-const UserModel = mongoose.models.User || mongoose.model<IUser, UserModelType>("User", UserSchema);
-
-UserSchema.method("isValidPassword", async function (password: string): Promise<boolean> {
-	const isValid = await compareSync(password, this.password);
-	return isValid;
+UserSchema.method("isValidPassword", function (password: string): boolean {
+	return compareSync(password, this.password);
 });
+
+type UserModelType = Model<IUser, {}, UserMethods>;
+const UserModel = mongoose.models.User || mongoose.model<IUser, UserModelType>("User", UserSchema);
 
 export { UserModel };

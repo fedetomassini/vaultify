@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { User, Mail, KeyRound, ChevronDown, Linkedin, Github } from "lucide-react";
 import { env } from "@/lib/env";
+import { z } from "zod";
 import ReactCountryFlag from "react-country-flag";
 import { useRouter } from "next/navigation";
 // User Features\\
 import { languages } from "@/lib/definitions";
+// Schema \\
+import { AuthValidation } from "@/lib/schema";
 
 /**
  * @alias UserAuthentication
@@ -25,6 +28,8 @@ export const AuthPanel = () => {
 
 	const navigate = useRouter();
 
+	const controls = useAnimation();
+
 	const toggleForm = () => {
 		setIsLogin(!isLogin);
 		setError("");
@@ -36,35 +41,38 @@ export const AuthPanel = () => {
 		e.preventDefault();
 		setError("");
 
-		if (isLogin) {
-			try {
-				const response = await fetch("/api/auth/signin", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, email, password }),
-				});
+		await controls.start({
+			scale: [1, 0.9, 1],
+			transition: { duration: 0.3 },
+		});
 
-				if (!response.ok) {
-					const data = await response.json();
-					setError(data.message);
-				}
-				navigate.refresh();
-			} catch (err) {
-				setError("An error occurred. Please try again.");
+		try {
+			const validationSchema = isLogin ? AuthValidation.omit({ email: true }) : AuthValidation;
+
+			validationSchema.parse({
+				username,
+				email: isLogin ? undefined : email,
+				password,
+			});
+
+			const endpoint = isLogin ? "/api/auth/signin" : "/api/auth/signup";
+
+			const response = await fetch(endpoint, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ username, email: isLogin ? undefined : email, password }),
+			});
+
+			if (!response.ok) {
+				const data = await response.json();
+				setError(data.message);
+			} else {
+				navigate.push("/vault");
 			}
-		} else {
-			try {
-				const response = await fetch("/api/auth/signup", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, email, password }),
-				});
-
-				if (!response.ok) {
-					const data = await response.json();
-					setError(data.message);
-				}
-			} catch (err) {
+		} catch (err) {
+			if (err instanceof z.ZodError) {
+				setError(err.errors[0]?.message || "Validation error");
+			} else {
 				setError("An error occurred. Please try again.");
 			}
 		}
@@ -83,7 +91,7 @@ export const AuthPanel = () => {
 						<div className="relative">
 							<button
 								onClick={toggleLanguageMenu}
-								className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50"
+								className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-md focus:outline-none transition-colors"
 							>
 								<ReactCountryFlag
 									countryCode={languages.find((lang) => lang.code === language)?.countryCode || "GB"}
@@ -107,7 +115,7 @@ export const AuthPanel = () => {
 												setLanguage(lang.code);
 												setIsLanguageMenuOpen(false);
 											}}
-											className="flex items-center space-x-2 w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+											className="flex items-center space-x-2 w-full px-4 py-2 text-left text-sm rounded-md hover:bg-gray-600 focus:outline-none transition-colors focus:bg-gray-600"
 										>
 											<ReactCountryFlag
 												countryCode={lang.countryCode}
@@ -157,7 +165,7 @@ export const AuthPanel = () => {
 										id="username"
 										value={username}
 										onChange={(e) => setUserName(e.target.value)}
-										className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50  disabled:opacity-50 text-gray-300"
+										className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300 transition-colors"
 										placeholder="Enter your username..."
 										autoComplete="off"
 										autoCorrect="off"
@@ -183,7 +191,7 @@ export const AuthPanel = () => {
 											id="email"
 											value={email}
 											onChange={(e) => setEmail(e.target.value)}
-											className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300"
+											className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300 transition-colors"
 											placeholder="Insert a valid email..."
 											autoComplete="off"
 											autoCorrect="off"
@@ -209,12 +217,12 @@ export const AuthPanel = () => {
 										id="password"
 										value={password}
 										onChange={(e) => setPassword(e.target.value)}
-										className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300"
+										className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 disabled:opacity-50 text-gray-300 transition-colors"
 										placeholder="•••••••••••••"
 										autoComplete="off"
 										autoCorrect="off"
-										min={1}
-										minLength={1}
+										min={10}
+										minLength={10}
 										max={50}
 										maxLength={50}
 									/>
@@ -222,10 +230,11 @@ export const AuthPanel = () => {
 							</div>
 							{error && <p className="text-red-400 text-sm">{error}</p>}
 							<motion.button
+								animate={controls}
 								whileHover={{ scale: 1.015 }}
 								whileTap={{ scale: 0.95 }}
 								type="submit"
-								className="w-full py-2 px-4 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed text-gray-900"
+								className="w-full py-2 px-4 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 transition-colors"
 							>
 								{isLogin ? "Sign in" : "Sign Up"}
 							</motion.button>
@@ -240,7 +249,7 @@ export const AuthPanel = () => {
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -20 }}
 									transition={{ duration: 0.2 }}
-									href="#"
+									href="/"
 									className="block text-sm text-emerald-200/80 hover:underline underline-offset-4"
 								>
 									Forgot password?
@@ -257,14 +266,17 @@ export const AuthPanel = () => {
 						</motion.button>
 					</div>
 					<div className="mt-6 flex justify-center space-x-4">
-						<a href="mailto:fedetomassini.dev@gmail.com" className="text-emerald-200/80 hover:text-emerald-200">
+						<a
+							href="mailto:fedetomassini.dev@gmail.com"
+							className="text-emerald-200/80 hover:text-emerald-200 transition-colors"
+						>
 							<Mail size={20} />
 						</a>
 						<a
 							href="https://linkedin.com/in/fedetomassini"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-emerald-200/80 hover:text-emerald-200"
+							className="text-emerald-200/80 hover:text-emerald-200 transition-colors"
 						>
 							<Linkedin size={20} />
 						</a>
@@ -272,7 +284,7 @@ export const AuthPanel = () => {
 							href="https://github.com/fedetomassini/vaultify"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-emerald-200/80 hover:text-emerald-200"
+							className="text-emerald-200/80 hover:text-emerald-200 transition-colors"
 						>
 							<Github size={20} />
 						</a>
