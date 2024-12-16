@@ -6,7 +6,6 @@ import { hashSync, compareSync } from "bcryptjs";
  */
 interface IPassword {
 	site: string;
-	username: string;
 	password: string;
 	category: string;
 	createdAt: Date;
@@ -29,7 +28,6 @@ interface UserMethods {
 
 const PasswordSchema = new Schema<IPassword>({
 	site: { type: String, required: true },
-	username: { type: String, required: true },
 	password: { type: String, required: true },
 	category: { type: String, default: "General" },
 	createdAt: { type: Date, default: Date.now },

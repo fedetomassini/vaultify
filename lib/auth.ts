@@ -1,51 +1,41 @@
 import { connectDB } from "@/lib/db/mongo";
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 import { env } from "@/lib/env";
-import credentials from "next-auth/providers/credentials";
-// Models \\
+import CredentialsProvider from "next-auth/providers/credentials";
 import { UserModel } from "@/lib/db/models";
 
-class InvalidLoginError extends CredentialsSignin {
-	code = "Username or password are invalid.";
-}
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const config: NextAuthConfig = {
 	providers: [
-		credentials({
+		CredentialsProvider({
 			name: "Credentials",
 			credentials: {
 				username: { label: "Username", type: "text" },
 				password: { label: "Password", type: "password" },
-				email: { label: "Email", type: "email" },
 			},
-			async authorize(credentials: any) {
+			async authorize(credentials) {
 				await connectDB();
-				const user: any = await UserModel.findOne({ username: credentials.username });
+				const user = await UserModel.findOne({ username: credentials?.username });
 
-				if (user && (await user.verifyPassword(credentials.password))) {
-					return {
-						id: user._id.toString(),
-						name: user.username,
-						email: user.email,
-					};
+				if (user && credentials?.password) {
+					const isValid = await user.isValidPassword(credentials.password);
+					if (isValid) {
+						return {
+							id: user._id.toString(),
+							name: user.username,
+							email: user.email,
+						};
+					}
 				}
-
-				throw new InvalidLoginError();
+				return null;
 			},
 		}),
 	],
 	session: {
 		strategy: "jwt",
-		maxAge: 900,
-		updateAge: 900,
-	},
-	jwt: {
-		maxAge: 900,
+		maxAge: 15 * 60,
 	},
 	callbacks: {
-		async signIn({ user }) {
-			return user ? true : false;
-		},
 		async jwt({ token, user }) {
 			if (user) {
 				token.id = user.id;
@@ -55,13 +45,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			return token;
 		},
 		async session({ session, token }) {
-			session.user = {
-				id: token.id as string,
-				name: token.name as string,
-				email: token.email as string,
-			} as any;
+			if (token && session.user) {
+				session.user.id = token.id as string;
+				session.user.name = token.name as string;
+				session.user.email = token.email as string;
+			}
 			return session;
 		},
 	},
+	pages: {
+		signIn: "/auth/signin",
+	},
+	debug: process.env.NODE_ENV === "development",
 	secret: env.NEXT_AUTH_SECRET,
-});
+};
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config);

@@ -14,7 +14,7 @@ export async function GET(_request: Request) {
 		await connectDB();
 
 		const session = await auth();
-		if (!session) return NextResponse.json({ error: "Unauthorized." }, { status: 401 }); // => Needs fixes
+		if (!session) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
 		const user = await UserModel.findOne({ username: session.user?.name as string });
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 		await connectDB();
 
 		const session = await auth();
-		if (!session) return NextResponse.json({ error: "Unauthorized." }, { status: 401 }); // => Needs fixes
+		if (!session) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
 		const body = await request.json();
 		const { site, password, category } = body;
@@ -67,7 +67,7 @@ export async function DELETE(request: Request) {
 		await connectDB();
 
 		const session = await auth();
-		if (!session) return NextResponse.json({ error: "Unauthorized." }, { status: 401 }); // => Needs fixes
+		if (!session) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
 		const { searchParams } = new URL(request.url);
 		const passwordId = searchParams.get("id");

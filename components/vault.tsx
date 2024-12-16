@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Copy, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import { Copy, Plus, Trash2, Eye, EyeOff, Lock, Globe, Key, RefreshCw, Save, List } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 // Interfaces \\
 import { PasswordEntry } from "@/lib/definitions";
@@ -29,6 +29,27 @@ export const UserVault = () => {
 		password: "",
 		category: "Entertainment",
 	});
+
+	useEffect(() => {
+		const fetchPasswords = async () => {
+			try {
+				const response = await fetch("/api/user/passwords", {
+					method: "GET",
+					credentials: "include",
+				});
+				if (response.ok) {
+					const data = await response.json();
+					setPasswords(data);
+				} else {
+					console.error("Failed to fetch passwords");
+				}
+			} catch (error) {
+				console.error("Error fetching passwords:", error);
+			}
+		};
+
+		fetchPasswords();
+	}, []);
 
 	const generatePassword = useCallback(() => {
 		const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -115,7 +136,10 @@ export const UserVault = () => {
 					transition={{ delay: 0.3, duration: 0.5 }}
 				>
 					<div className="flex justify-between items-center mb-4">
-						<h2 className="text-2xl font-semibold text-emerald-200/80">~ Saved Passwords ~</h2>
+						<h2 className="text-2xl font-semibold text-emerald-200/80 flex items-center">
+							<List className="mr-2" />
+							Saved Passwords
+						</h2>
 					</div>
 					<AnimatePresence>
 						{passwords.length === 0 ? (
@@ -123,8 +147,9 @@ export const UserVault = () => {
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="text-gray-400"
+								className="text-gray-400 flex items-center justify-center p-4"
 							>
+								<Lock className="mr-2" />
 								No saved passwords yet.
 							</motion.div>
 						) : (
@@ -138,7 +163,10 @@ export const UserVault = () => {
 									className="bg-gray-800 rounded-md p-4 mb-4"
 								>
 									<div className="flex justify-between items-center">
-										<span className="text-emerald-200/80 font-bold mb-3">{item.site}</span>
+										<span className="text-emerald-200/80 font-bold mb-3 flex items-center">
+											<Globe className="mr-2" />
+											{item.site}
+										</span>
 										<motion.button
 											whileHover={{ scale: 1.1 }}
 											whileTap={{ scale: 0.9 }}
@@ -149,12 +177,15 @@ export const UserVault = () => {
 										</motion.button>
 									</div>
 									<div className="flex items-center space-x-2">
-										<input
-											type={showPasswords[item.id] ? "text" : "password"}
-											value={showPasswords[item.id] ? item.password : "**************"}
-											readOnly
-											className="bg-gray-700 text-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 w-full transition-colors"
-										/>
+										<div className="relative flex-grow">
+											<Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-200/60" />
+											<input
+												type={showPasswords[item.id] ? "text" : "password"}
+												value={showPasswords[item.id] ? item.password : "**************"}
+												readOnly
+												className="bg-gray-700 text-gray-300 pl-10 pr-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 w-full transition-colors"
+											/>
+										</div>
 										<motion.button
 											whileHover={{ scale: 1.1 }}
 											whileTap={{ scale: 0.9 }}
@@ -185,9 +216,15 @@ export const UserVault = () => {
 					transition={{ delay: 0.4, duration: 0.5 }}
 					className="space-y-4"
 				>
-					<h2 className="text-2xl font-semibold text-emerald-200/80">~ Add New Password ~</h2>
-					<div className="space-y-2">
-						<label className="text-gray-300">Website</label>
+					<h2 className="text-2xl font-semibold text-emerald-200/80 flex items-center">
+						<Plus className="mr-2" />
+						Add New Password
+					</h2>
+					<div className="space-y-5">
+						<label className="text-gray-300 flex items-center">
+							<Globe className="mr-2" />
+							Website
+						</label>
 						<motion.input
 							whileFocus={{ scale: 1.02 }}
 							type="text"
@@ -198,7 +235,10 @@ export const UserVault = () => {
 							className="w-full p-3 bg-gray-700 text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-200/50 transition-colors"
 						/>
 						<div className="space-y-2">
-							<label className="text-gray-300">Generated Password</label>
+							<label className="text-gray-300 flex items-center">
+								<Key className="mr-2" />
+								Generated Password
+							</label>
 							<div className="relative">
 								<motion.input
 									whileFocus={{ scale: 1.02 }}
@@ -222,15 +262,19 @@ export const UserVault = () => {
 							</div>
 						</div>
 						<div className="space-y-2">
-							<label className="text-gray-300">Category</label>
+							<label className="text-gray-300 flex items-center">
+								<List className="mr-2" />
+								Category
+							</label>
 							<Selector value={newPassword.category} onChange={handleCategoryChange} options={categoryOptions} />
 						</div>
 						<motion.button
 							whileHover={{ scale: 1.02 }}
 							whileTap={{ scale: 0.98 }}
 							onClick={handleAddPassword}
-							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md transition-colors"
+							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md transition-colors flex items-center justify-center"
 						>
+							<Save className="mr-2" />
 							Add Password
 						</motion.button>
 					</div>
@@ -241,10 +285,14 @@ export const UserVault = () => {
 					transition={{ delay: 0.5, duration: 0.5 }}
 					className="space-y-4"
 				>
-					<h2 className="text-2xl font-semibold text-emerald-200/80">~ Password Generator ~</h2>
+					<h2 className="text-2xl font-semibold text-emerald-200/80 flex items-center">
+						<RefreshCw className="mr-2" />
+						Password Generator
+					</h2>
 					<div className="bg-gray-800 rounded-lg p-6 space-y-4">
 						<div>
-							<label htmlFor="passwordLength" className="block text-gray-300 mb-1">
+							<label htmlFor="passwordLength" className="text-gray-300 mb-1 flex items-center">
+								<Key className="mr-2" />
 								Password Length
 							</label>
 							<motion.input
@@ -259,7 +307,7 @@ export const UserVault = () => {
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="block text-gray-300">
+							<label className="text-gray-300 flex items-center">
 								<input
 									type="checkbox"
 									checked={useUppercase}
@@ -268,7 +316,7 @@ export const UserVault = () => {
 								/>
 								Include Uppercase Letters
 							</label>
-							<label className="block text-gray-300">
+							<label className="text-gray-300 flex items-center">
 								<input
 									type="checkbox"
 									checked={useNumbers}
@@ -277,7 +325,7 @@ export const UserVault = () => {
 								/>
 								Include Numbers
 							</label>
-							<label className="block text-gray-300">
+							<label className="text-gray-300 flex items-center">
 								<input
 									type="checkbox"
 									checked={useSymbols}
@@ -291,8 +339,9 @@ export const UserVault = () => {
 							whileHover={{ scale: 1.02 }}
 							whileTap={{ scale: 0.98 }}
 							onClick={generatePassword}
-							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md transition-colors"
+							className="w-full p-3 font-medium text-gray-900 bg-emerald-200/60 hover:bg-emerald-200/80 rounded-md transition-colors flex items-center justify-center"
 						>
+							<RefreshCw className="mr-2" />
 							Generate Password
 						</motion.button>
 					</div>

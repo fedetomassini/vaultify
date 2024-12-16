@@ -16,9 +16,6 @@ export const metadata: Metadata = {
 	},
 	creator: "Federico Tomassini",
 	publisher: "Novabyte Studio",
-	// verification: {
-	// 	google: "",
-	// },
 	openGraph: {
 		title: "Vaultify",
 		description:
@@ -30,7 +27,7 @@ export const metadata: Metadata = {
 			type: "image/x-icon",
 		},
 		siteName: "Vaultify",
-		locale: "Spanish, Argentina",
+		locale: "English",
 	},
 	twitter: {
 		title: "Vaultify",

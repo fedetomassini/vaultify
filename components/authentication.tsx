@@ -8,6 +8,7 @@ import { env } from "@/lib/env";
 import { z } from "zod";
 import ReactCountryFlag from "react-country-flag";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 // User Features\\
 import { languages } from "@/lib/definitions";
 // Schema \\
@@ -55,19 +56,41 @@ export const AuthPanel = () => {
 				password,
 			});
 
-			const endpoint = isLogin ? "/api/auth/signin" : "/api/auth/signup";
+			if (isLogin) {
+				const result = await signIn("credentials", {
+					username,
+					password,
+					redirect: false,
+				});
 
-			const response = await fetch(endpoint, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ username, email: isLogin ? undefined : email, password }),
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				setError(data.message);
+				if (result?.error) {
+					setError(result.error);
+				} else {
+					navigate.push("/vault");
+				}
 			} else {
-				navigate.push("/vault");
+				const response = await fetch("/api/auth/signup", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, email, password }),
+				});
+
+				if (!response.ok) {
+					const data = await response.json();
+					setError(data.message);
+				} else {
+					const result = await signIn("credentials", {
+						username,
+						password,
+						redirect: false,
+					});
+
+					if (result?.error) {
+						setError(result.error);
+					} else {
+						navigate.push("/vault");
+					}
+				}
 			}
 		} catch (err) {
 			if (err instanceof z.ZodError) {
