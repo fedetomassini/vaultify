@@ -116,6 +116,22 @@ export const UserVault = () => {
 		navigator.clipboard.writeText(text);
 	};
 
+	const handleDeletePassword = async (id: number) => {
+		try {
+			const response = await fetch(`/api/user/passwords/${id}`, {
+				method: "DELETE",
+				credentials: "include",
+			});
+			if (response.ok) {
+				setPasswords((prev) => prev.filter((password) => password.id !== id));
+			} else {
+				console.error("Failed to delete password");
+			}
+		} catch (error) {
+			console.error("Error deleting password:", error);
+		}
+	};
+
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
@@ -170,6 +186,7 @@ export const UserVault = () => {
 										<motion.button
 											whileHover={{ scale: 1.1 }}
 											whileTap={{ scale: 0.9 }}
+											onClick={() => handleDeletePassword(item.id)}
 											className="text-red-400/40 hover:text-red-400/70 focus:outline-none"
 											aria-label="Delete password"
 										>
@@ -220,7 +237,7 @@ export const UserVault = () => {
 						<Plus className="mr-2" />
 						Add New Password
 					</h2>
-					<div className="space-y-5">
+					<div className="space-y-2">
 						<label className="text-gray-300 flex items-center">
 							<Globe className="mr-2" />
 							Website
@@ -291,7 +308,7 @@ export const UserVault = () => {
 					</h2>
 					<div className="bg-gray-800 rounded-lg p-6 space-y-4">
 						<div>
-							<label htmlFor="passwordLength" className="text-gray-300 mb-1 flex items-center">
+							<label htmlFor="passwordLength" className="block text-gray-300 mb-1 flex items-center">
 								<Key className="mr-2" />
 								Password Length
 							</label>
@@ -307,7 +324,7 @@ export const UserVault = () => {
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="text-gray-300 flex items-center">
+							<label className="block text-gray-300 flex items-center">
 								<input
 									type="checkbox"
 									checked={useUppercase}
@@ -316,7 +333,7 @@ export const UserVault = () => {
 								/>
 								Include Uppercase Letters
 							</label>
-							<label className="text-gray-300 flex items-center">
+							<label className="block text-gray-300 flex items-center">
 								<input
 									type="checkbox"
 									checked={useNumbers}
@@ -325,7 +342,7 @@ export const UserVault = () => {
 								/>
 								Include Numbers
 							</label>
-							<label className="text-gray-300 flex items-center">
+							<label className="block text-gray-300 flex items-center">
 								<input
 									type="checkbox"
 									checked={useSymbols}
